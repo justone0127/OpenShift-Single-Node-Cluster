@@ -354,9 +354,9 @@ firewall-cmd --reload
           allow-update { none; };
   };
   
-  zone "168.76.10.in-addr.arpa" IN {
+  zone "xxx.xx.xx.in-addr.arpa" IN {
           type master;
-          file "/var/named/168.76.10.in-addr.rev";
+          file "/var/named/xxx.xx.xx.in-addr.rev";
           allow-update { none; };
   };
   ```
