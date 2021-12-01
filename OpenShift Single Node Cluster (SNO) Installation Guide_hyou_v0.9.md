@@ -1109,7 +1109,7 @@ Console 접속을 위해서 hosts 파일에 내용을 추가합니다.
 
   kubeadmin 계정으로 로그인하면 다음과 같이 Single Node로 구성된 Cluster를 확인할 수 있습니다.
 
-  ![01_single_node_cluster_console](C:\Works\openshift\intsall\install_guide\4.9\01_single_node_cluster_console.png)
+  ![01_single_node_cluster_console](https://github.com/justone0127/OpenShift-Single-Node-Cluster/blob/main/01_single_node_cluster_console.png)
 
 
 
