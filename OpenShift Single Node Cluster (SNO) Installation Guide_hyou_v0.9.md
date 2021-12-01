@@ -653,99 +653,7 @@ systemctl start haproxy
 systemctl status haproxy
 ```
 
-### 8. Chrony 설정
-
-모든 서버의 시간 동기화를 위해 Chrony 설정이 필요하며, 시간이 맞지 않을 경우 데이터 수집시 시간이 맞지 않아서 모니터링 대시보드가 제대로 보이지 않을 가능성이 있습니다.
-
-**8-1) Chrony 설치**
-
-Bastion 서버에 chrony 를 설치합니다.
-
-```bash
-$ yum install -y chrony 
-```
-
-**8-2) chrony 설정 파일 수정 (/etc/chrony.conf)**
-
-```bash
-# Use public servers from the pool.ntp.org project.
-# Please consider joining the pool (http://www.pool.ntp.org/join.html).
-server bastion.single.demo.com iburst // chrony 서버 설정
-
-# Record the rate at which the system clock gains/losses time.
-driftfile /var/lib/chrony/drift
-
-# Allow the system clock to be stepped in the first three updates
-# if its offset is larger than 1 second.
-makestep 1.0 3
-
-# Enable kernel synchronization of the real-time clock (RTC).
-rtcsync
-
-# Enable hardware timestamping on all interfaces that support it.
-#hwtimestamp *
-
-# Increase the minimum number of selectable sources required to adjust
-# the system clock.
-#minsources 2
-
-# Allow NTP client access from local network.
-allow xx.xxx.xx.x/24 // 내부 네트워크에서 이 서버를 타임서버로 참조하기 위한 설정
-
-# Serve time even if not synchronized to a time source.
-#local stratum 10
-local stratum 3 // 값을 3으로 변경
-
-# Specify file containing keys for NTP authentication.
-#keyfile /etc/chrony.keys
-
-# Specify directory for log files.
-logdir /var/log/chrony
-
-# Select which information is logged.
-#log measurements statistics tracking
-```
-
-**8-3) chrony 서비스 등록 및 시작 (Basiton)**
-
-```bash
-$ systemctl enable chronyd 
-$ systemctl start chronyd 
-$ systemctl status chronyd 
-```
-
-**8-4) NTP Port 방화벽 해제** 
-
-```bash
-$ firewall-cmd --perm --add-service=ntp
-$ firewall-cmd --reload
-$ firewall-cmd --perm --add-port=123/tcp
-$ firewall-cmd --perm --add-port=123/udp
-$ firewall-cmd --reload
-```
-
-**8-5) chrony service 확인**
-
-```bash
-[root@bastion ~]# chronyc sources -v
-210 Number of sources = 1
-
-  .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
- / .- Source state '*' = current synced, '+' = combined , '-' = not combined,
-| /   '?' = unreachable, 'x' = time may be in error, '~' = time too variable.
-||                                                 .- xxxx [ yyyy ] +/- zzzz
-||      Reachability register (octal) -.           |  xxxx = adjusted offset,
-||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
-||                                \     |          |  zzzz = estimated error.
-||                                 |    |           \
-MS Name/IP address         Stratum Poll Reach LastRx Last sample
-===============================================================================
-^* bastion.single.demo.com       3  10   377  184m  -2907ns[  -15us] +/-   21us
-// *부분이 ?이면 안 된다.
-// 다른 서버에서는 해당 부분이 hostname 대신 IP 또는 Hostname으로 보여질 것임
-```
-
-### 9. ssh-key 생성
+### 8. ssh-key 생성
 
 설치를 진행할 bastion 서버에서 ssh key 생성과 ssh-agent에 key를 등록합니다.
 
@@ -784,27 +692,27 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
   Identity added: /root/.ssh/id_rsa (/root/.ssh/id_rsa)
   ```
 
-### 10. Install 사전 확인
+### 9. Install 사전 확인
 
-**10-1) IP 확인**
+**9-1) IP 확인**
 
 ```bash
 [root@bastion ~]# ip addr
 ```
 
-**10-2) DNS 서비스 확인**
+**9-2) DNS 서비스 확인**
 
 ```bash
 $ systemctl status named
 ```
 
-**10-3) Haproxy 서비스 확인**
+**9-3) Haproxy 서비스 확인**
 
 ```bash
 $ systemctl status haproxy
 ```
 
-**10-4) chrony 서비스 확인**
+**9-4) chrony 서비스 확인**
 
 ``` bash
 $ systemctl status chronyd
@@ -812,9 +720,9 @@ $ systemctl status chronyd
 
 
 
-### 11. install-config.yaml 생성
+### 10. install-config.yaml 생성
 
-**11-1) Install에 필요한 파일 다운로드**
+**10-1) Install에 필요한 파일 다운로드**
 
 - rhcos iso 파일, openshift-install, openshift-client 다운로드  (/var/www/html)
 
@@ -824,7 +732,7 @@ $ systemctl status chronyd
   wget -P /var/www/html https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.9.8/openshift-client-linux-4.9.8.tar.gz 
   ```
 
-**11-2) 파일 압축 해제**
+**10-2) 파일 압축 해제**
 
 - openshift-install, openshift-client 파일 압축 해제
 
@@ -833,7 +741,7 @@ $ systemctl status chronyd
   tar -xzf /var/www/html/openshift-install-linux-4.9.8.tar.gz -C /usr/local/bin/
   ```
 
-**11-3) OpenShift CLI를 위한 bash 환경 변수 설정**
+**10-3) OpenShift CLI를 위한 bash 환경 변수 설정**
 
 - 환경 변수 설정
 
@@ -841,7 +749,7 @@ $ systemctl status chronyd
   oc completion bash >/etc/bash_completion.d/openshift
   ```
 
-**11-4) `rhcos-4.9.0-x86_64-metal.x86_64.raw.gz`파일 이름 변경**
+**10-4) `rhcos-4.9.0-x86_64-metal.x86_64.raw.gz`파일 이름 변경**
 
 설치 시 원활한 진행을 위해 파일 이름을 짧게 변경하여 사용하시는 것이 좋습니다.
 
@@ -849,7 +757,7 @@ $ systemctl status chronyd
 mv rhcos-4.9.0-x86_64-metal.x86_64.raw.gz bios.raw.gz
 ```
 
-**11-5) install-config.yaml 생성**
+**10-5) install-config.yaml 생성**
 
 OpenShift를 설치할 디렉토리를 생성한 후 `install-config.yaml`을 작성합니다.
 
@@ -895,9 +803,9 @@ OpenShift를 설치할 디렉토리를 생성한 후 `install-config.yaml`을 �
 
 
 
-### 12. Ignition 파일 생성
+### 11. Ignition 파일 생성
 
-**12-1) install-config.yaml 생성**
+**11-1) install-config.yaml 생성**
 
 -  생성된 ignition config 파일은 24시간 동안 유효한 인증서를 포함하고 있어서 반드시 24시간 내에 OpenShift Cluster 구성을 완료해야 합니다.
 
@@ -907,7 +815,7 @@ OpenShift를 설치할 디렉토리를 생성한 후 `install-config.yaml`을 �
   [root@bastion ocp]# cp install-config.yaml install-config.yaml_bak
   ```
 
-**12-2) Kubernetes manifest file 생성**
+**11-2) Kubernetes manifest file 생성**
 
 Single Node Cluster의 경우 Master가 Worker Node의 역할까지 포함하고 있으므로 `masterSchedulable` 값을 변경하지 않고 진행합니다.
 
@@ -917,7 +825,7 @@ Single Node Cluster의 경우 Master가 Worker Node의 역할까지 포함하고
   $ openshift-install create manifests --dir=/root/ocp49
   ```
 
-**12-3) ignition config 파일 생성**
+**11-3) ignition config 파일 생성**
 
 - ignition config 파일 생성
 
@@ -940,7 +848,7 @@ Single Node Cluster의 경우 Master가 Worker Node의 역할까지 포함하고
 
 
 
-### 13. 노드 구성
+### 12. 노드 구성
 
 Single Node Cluster 구성 시에도 초기 구성을 위해 bootstrap node를 시작으로 구성됩니다. 이후 master node를 설치 할 때, TAB Key를 눌러서 다음과 같이 명령어를 입력하고 설치를 시작하며, 명령어는 한 줄로 입력되어야 합니다.
 
@@ -995,7 +903,7 @@ Single Node Cluster 구성 시에도 초기 구성을 위해 bootstrap node를 �
   $ journalctl -b -f -u release-image.service -u bootkube.service
   ```
 
-### 14. Initial Cluster Operator Configuration
+### 13. Initial Cluster Operator Configuration
 
 Cluster 구성이 시작되면 Operator가 정상적으로 설치되고 있는지 확인할 수 있습니다.
 
@@ -1073,7 +981,7 @@ Cluster 구성이 시작되면 Operator가 정상적으로 설치되고 있는�
   설치가 완료되면 OpenShift Console, API 접속 정보 및 기본 계정인 `kubeadmin` 계정의 패스워드를 함께 확인 할 수 있습니다.
 
 
-### 15. Logging in to the Cluster
+### 14. Logging in to the Cluster
 
 Cluster kubeconfig 파일을 export해서 기본 시스템 사용자로 Cluster에 로그인 할 수 있습니다. kubeconfig 파일에는 CLI 클라이언트를 올바른 Cluster 및 API 서버에 연결하는 데 사용하는 Cluster에 대한 정보가 포함되어 있습니다. 이 파일은 Cluster에 따라 다르며 OpenShift Container Platform 설치 중에 생성됩니다.
 
@@ -1094,7 +1002,7 @@ Cluster kubeconfig 파일을 export해서 기본 시스템 사용자로 Cluster�
 
 
 
-### 16. Console 접속
+### 15. Console 접속
 
 Console 접속을 위해서 hosts 파일에 내용을 추가합니다.
 
