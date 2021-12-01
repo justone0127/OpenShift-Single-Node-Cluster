@@ -661,7 +661,7 @@ systemctl status haproxy
 
 - 운영 환경에서는 재해 복구 및 디버깅이 필요
 
-- ==`ssh-key`를 사용하여 bastion node에서 다른 node로 `core` user로 SSH로 접속 할 수 있음== 
+- `ssh-key`를 사용하여 bastion node에서 다른 node로 `core` user로 SSH로 접속 할 수 있음 
 
   ```bash
   [root@bastion ~]# ssh-keygen -t rsa -b 4096
