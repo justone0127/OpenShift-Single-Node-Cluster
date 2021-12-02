@@ -1,0 +1,1 @@
+# OpenShift-Single-Node-Cluster
